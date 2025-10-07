@@ -21,19 +21,20 @@ class Trie:
     def getFromFile(self,filename: str) -> bool:
         try:
             with open(filename,'r') as file_in:
-                for word in file_in:
+                words = file_in.read()
+                for word in words.split():
                     word_clean = word.strip().lower()
-                    if word.isalpha():
+
+                    if word_clean.isalpha():
                         self.insert(word_clean)
+
                 return True
+
         except Exception as e:
             return False
                 
     
     def insert(self,word: str) -> bool:
-        if not word.isalpha():
-            return False
-
         cur_node = self.root
         for ch in word:
 
@@ -86,13 +87,13 @@ class Trie:
     def words(self) -> [str]:
         cur_node = self.root
         wordsList = []
-        for cur in cur_node.children:
-            self.wordsHelper(cur_node.children[cur],cur,wordsList)
-        return wordsList
+        for char in cur_node.children:
+            self.wordsHelper(cur_node.children[char],char,wordsList)
+        return sorted(wordsList)
 
     def wordsHelper(self, curNode, curString, wordList:[str]):
         if curNode.isWord:
             wordList.append(curString)
 
-        for cur in curNode.children:
-            self.wordsHelper(curNode.children[cur],curString + cur.ch,wordList)
+        for char in curNode.children:
+            self.wordsHelper(curNode.children[char],curString + char,wordList)
