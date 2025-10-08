@@ -5,37 +5,111 @@ Created on Mon Sep 15 14:37:19 2025
 @author: troy
 """
 from sbtrie import SBTrie 
+from trie import Trie
 
 # the following functions are to exist with the parameters as written
 # the autograder may call these functions
 
 def getNewDictionary(sbt, filename):
   # enter needed code here for command 1
-  pass
+  sbt.clear()
+  sbt.getFromFile(filename)
 
 def updateDictionary(sbt, filename):
   # enter needed code here for command 2
-  pass
+  sbt.getFromFile(filename)
+  
 
 def setupLetters(sbt, letters):
   # enter needed code here for command 3
-  pass
-
+  letters_clean = ""
+  for char in letters:
+    char_clean = char.lower()
+    if char_clean.isalpha() and char_clean not in letters_clean:
+      letters_clean += char_clean
+  if len(letters_clean) != 7:
+    print("Invalid letter set")
+  else:
+    sbt.discovered_words = Trie()
+    sbt.current_score = 0
+    sbt.pangram_found = False
+    sbt.bingo_found = False
+    sbt.start_letters = {}
+    sbt.central_letter = letters_clean[0]
+    sbt.allowed_letters = {}
+    for letter in letters_clean:
+      sbt.allowed_letters[letter] = True
+  
 def showLetters(sbt):
   # enter needed code here for command 4
-  pass
+  other_letters = ""
+  for char in sbt.allowed_letters:
+    if char != sbt.central_letter:
+      other_letters += char
+  other_letters_sorted = "".join(sorted(other_letters))
+
+  print(f"Central Letter:  {sbt.central_letter}") 
+  print(f"6 Other Letters:  {','.join(other_letters_sorted)}")
 
 def attemptWord(sbt, word):
   # enter needed code here for command 5
-  pass
+  res = sbt.isNewSBWord(word)
+  match res:
+    case -1:
+      print("word is too short")
+    case -2:
+      print("word is missing central letter")
+    case -3:
+      print("word contains invalid letter")
+    case -4:
+      print("word is not in the dictionary")
+    case -5:
+      print("word has already been found")
+    case _:
+      sbt.addFoundWord(word)
+      sbt.current_score += res
+
+      bingo_message = ""
+
+      if sbt.hasBingo():
+        bingo_message = ", Bingo scored"
+      pangram_message = ", Pangram found" if sbt.isPangram(word) else ""
+      print(f"found {word} {res} {'points' if res>1 else 'point'}, total {sbt.current_score} points{pangram_message}{bingo_message}")
 
 def showFoundWords(sbt):
   # enter needed code here for command 6
-  pass
+  p_msg = ""
+  b_msg = ""
+  if sbt.pangram_found:
+    p_msg = ", Pangram found"
+  if sbt.bingo_found:
+    b_msg = ", Bingo scored"
+  print(f"{sbt.discovered_words.word_count} words found, total {sbt.current_score}{p_msg}{b_msg}")
 
 def showAllWords(sbt):
   # enter needed code here for command 7
-  pass
+  other_letters = ""
+  for char in sbt.allowed_letters:
+    if char != sbt.central_letter:
+      other_letters += char
+  all_sb_words = sbt.sbWords(sbt.central_letter,other_letters)
+
+  bingo_dict = {}
+
+  for word in all_sb_words:
+    length = len(word)
+    bingo_dict[word[0]] = True
+    pangram = " Pangram" if sbt.isPangram(word) else ""
+
+    if length > 17:
+      print(f"{word} {length}{pangram}")
+    else:
+      print(f"{word:<19}{length}{pangram}")
+  if len(bingo_dict) == 7:
+    print("Bingo found")
+
+
+
 
 def displayCommands():
   print( "\nCommands are given by digits 1 through 9\n")
