@@ -48,8 +48,8 @@ def showLetters(sbt):
       other_letters += char
   other_letters_sorted = "".join(sorted(other_letters))
 
-  print(f"Central Letter:  {sbt.central_letter}") 
-  print(f"6 Other Letters:  {','.join(other_letters_sorted)}")
+  print(f"Central Letter: {sbt.central_letter}") 
+  print(f"6 Other Letters: {','.join(other_letters_sorted)}")
 
 def attemptWord(sbt, word):
   # enter needed code here for command 5
